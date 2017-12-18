@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+        <style name="TextViewListStyle">
+                <item name="android:layout_height">wrap_content</item>
+                <item name="android:layout_width">125dp</item>
+                <item name="android:paddingRight">2dp</item>
+                <item name="android:paddingLeft">2dp</item>
+                <item name="android:textSize">@dimen/text_size</item>
+                <item name="android:gravity">center</item>
+                <item name="android:background">@drawable/grid_line_bg</item>
+                <item name="android:clickable">true</item>
+                <item name="android:contextClickable">true</item>
+                <item name="android:focusable">true</item>
+                <item name="android:focusableInTouchMode">true</item>
+                android:background="@drawable/grid_line_style"
+                android:clickable="true"
+                android:contextClickable="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:listSelector="@android:color/holo_blue_bright"
+
+        </style>
+</resources>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--扫描编辑框的背景色，获得焦点时背景绿色，失去焦点时背景灰色-->
+    <item
+        android:drawable="@drawable/edittext_scan_bg"
+        android:state_focused="true"
+        />
+
+    <item
+        android:drawable="@drawable/edittext_read_bg"/>
+</selector>

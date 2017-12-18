@@ -1,0 +1,33 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="appbar_padding_top">8dp</dimen>
+
+    <!--公用的尺寸-->
+    <dimen name="row_margin_top">2dp</dimen>
+    <!--统一使用的左右上下内边距-->
+    <dimen name="padding_top">3dp</dimen>
+    <dimen name="padding_left">2dp</dimen>
+    <dimen name="padding_right">2dp</dimen>
+    <dimen name="padding_bottom">2dp</dimen>
+    <!---->
+    <dimen name="button_width">120dp</dimen>
+    <dimen name="button_margin_bottom">2dp</dimen>
+    <dimen name="button_margin_top">2dp</dimen>
+    <!--复选框高度-->
+    <dimen name="checkbox_margin_height">20dp</dimen>
+    <!--全局字体大小-->
+    <dimen name="text_size">16sp</dimen>
+    <!--列表-小型列宽度-->
+    <dimen name="list_small_width">80dp</dimen>
+    <!--列表-中型列宽度-->
+    <dimen name="list_middle_width">120dp</dimen>
+    <!--列表-大型列宽度-->
+    <dimen name="list_large_size">150dp</dimen>
+    <!--列表-序号列宽度-->
+    <dimen name="list_number_width">45dp</dimen>
+    <!--提示框的最大高度-->
+    <dimen name="tv_msg_height">100dp</dimen>
+</resources>
