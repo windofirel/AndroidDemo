@@ -1,1 +1,1 @@
-include ':app', ':butterknifedemo', ':myapplication', ':recycleviewdemo', ':servicedemo'
+include ':app', ':butterknifedemo', ':myapplication', ':recycleviewdemo', ':servicedemo', ':mvpdemo'
