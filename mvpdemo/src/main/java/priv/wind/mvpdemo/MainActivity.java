@@ -5,7 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
-    private Button btnOne;//按钮一
+    private Button btnOne;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
