@@ -3,7 +3,6 @@ package priv.wind.recycleviewdemo;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +13,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import priv.wind.recycleviewdemo.annotation.HeaderName;
+import priv.wind.recycleviewdemo.annotation.FormHeader;
 
 /**
  * @author Dongbaicheng
@@ -25,14 +24,14 @@ import priv.wind.recycleviewdemo.annotation.HeaderName;
 // TODO: 2017/12/9 表头增加序号以及控制显示接口
 // TODO: 2017/12/9 点击行高亮
 // TODO: 2017/12/9 对泛型实体字段进行排序
+// TODO: 2017/12/28 不要一开始就对数据源进行反射，应该在每次getItem时反射获取数据
 public class MyAdapter<T> extends RecyclerView.Adapter {
+    private static final int ITEM_HEADER_TYPE = 894;
+    private static final int ITEM_BODY_TYPE = 899;
     private List<T> mDatas;//原始数据源
     private List<String> mHeaders;//表头
     private Context mContext;//上下文环境
-    private SparseArray<ArrayList<String>> mBodys;//解析后的表体数据源
-
-    private static final int ITEM_HEADER_TYPE = 894;
-    private static final int ITEM_BODY_TYPE = 899;
+    private List<String[]> mBodys;//解析后的表体数据源
 
     MyAdapter(List<T> datas, Context context) {
         mDatas = datas;
@@ -48,9 +47,11 @@ public class MyAdapter<T> extends RecyclerView.Adapter {
      */
     public void add(T entity) {
         mDatas.add(entity);
-        ArrayList<String> dataRow = new ArrayList<>();
+
+        String[] dataRow = new String[mHeaders.size()];
+        int index = 0;
         for (Field field : entity.getClass().getDeclaredFields()) {
-            HeaderName annotation = field.getAnnotation(HeaderName.class);
+            FormHeader annotation = field.getAnnotation(FormHeader.class);
             if (annotation != null) {
                 String value = "";
                 try {
@@ -60,11 +61,11 @@ public class MyAdapter<T> extends RecyclerView.Adapter {
                     Log.e(this.getClass().toString(), "getDatas: ", e);
                     value = "值反射失败";
                 }
-                dataRow.add(value);
+                dataRow[index] = value;
+                index++;
             }
         }
-        int index = mBodys.size();
-        mBodys.put(index, dataRow);
+        mBodys.add(dataRow);
     }
 
     /**
@@ -120,17 +121,9 @@ public class MyAdapter<T> extends RecyclerView.Adapter {
         } else {
             final BodyViewHolder viewHolder = ((BodyViewHolder) holder);
             for (int i = 0; i < mHeaders.size(); i++) {
-                // FIXME: 2017/12/9 存在问题，删除时会存在key值不连续，导致取值失败
-                int j = -1;
-                int index = mBodys.indexOfKey(position + j);
-                while (index < 0) {
-                    j++;
-                    index = mBodys.indexOfKey(position + j);
-                }
-
                 //因为 position 0 是表头，所以数据行数 对应为 实际位置 - 1
-                ArrayList<String> list = mBodys.get(position - 1);
-                viewHolder.mTextViews.get(i).setText(list.get(i));
+                String[] list = mBodys.get(position - 1);
+                viewHolder.mTextViews.get(i).setText(list[i]);
             }
             viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
@@ -146,7 +139,6 @@ public class MyAdapter<T> extends RecyclerView.Adapter {
 
                 }
             });
-            viewHolder.itemView.setBackgroundResource(R.drawable.bg_item_view);
         }
     }
 
@@ -159,17 +151,18 @@ public class MyAdapter<T> extends RecyclerView.Adapter {
     /**
      * 解析获取表体数据
      *
-     * @param mDataTs 数据源
+     * @param mDatas 数据源
      * @return 表体数据
      */
-    private SparseArray<ArrayList<String>> getDatas(List<T> mDataTs) {
-        SparseArray<ArrayList<String>> datas = new SparseArray<>();
+    private List<String[]> getDatas(List<T> mDatas) {
+        List<String[]> datas = new ArrayList<>();
         //用一个 map存储通过反射从数据源获取的数据，通过反射筛选出标记了特性的字段
-        for (int i = 0; i < mDataTs.size(); i++) {
-            T entity = mDataTs.get(i);
-            ArrayList<String> dataRow = new ArrayList<>();
+        for (int i = 0; i < mDatas.size(); i++) {
+            T entity = mDatas.get(i);
+            String[] dataRow = new String[mHeaders.size()];
+            int index = 0;
             for (Field field : entity.getClass().getDeclaredFields()) {
-                HeaderName annotation = field.getAnnotation(HeaderName.class);
+                FormHeader annotation = field.getAnnotation(FormHeader.class);
                 if (annotation != null) {
                     String value = "";
                     try {
@@ -179,10 +172,11 @@ public class MyAdapter<T> extends RecyclerView.Adapter {
                         Log.e(this.getClass().toString(), "getDatas: ", e);
                         value = "值反射失败";
                     }
-                    dataRow.add(value);
+                    dataRow[index] = value;
+                    index++;
                 }
             }
-            datas.put(i, dataRow);
+            datas.add(dataRow);
         }
         return datas;
     }
@@ -198,7 +192,7 @@ public class MyAdapter<T> extends RecyclerView.Adapter {
         Class entityClass = entity.getClass();
         Field[] fields = entityClass.getDeclaredFields();
         for (Field field : fields) {
-            HeaderName annotation = field.getAnnotation(HeaderName.class);
+            FormHeader annotation = field.getAnnotation(FormHeader.class);
             if (annotation != null) {
                 headerNames.add(annotation.name());
             }

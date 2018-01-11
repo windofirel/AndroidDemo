@@ -4,7 +4,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import priv.wind.recycleviewdemo.annotation.HeaderName;
+import priv.wind.recycleviewdemo.annotation.FormHeader;
 
 /**
  * @author Dongbaicheng
@@ -23,7 +23,7 @@ public class ListHelper<T> {
 
         Field[] fields = entityClass.getDeclaredFields();
         for (Field field : fields) {
-            HeaderName annotation = field.getAnnotation(HeaderName.class);
+            FormHeader annotation = field.getAnnotation(FormHeader.class);
             if (annotation != null){
                 headerNames.add(annotation.name());
             }

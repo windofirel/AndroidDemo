@@ -6,13 +6,33 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 表头名称注解
+ * 表单表头注解
+ *
  * @author Dongbaicheng
  * @version 2017/12/4
  */
 
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface HeaderName {
+public @interface FormHeader {
+    /**
+     * 表头名称
+     *
+     * @return 表头名称
+     */
     String name() default "未命名";
+
+    /**
+     * 字段排序（从1开始）
+     *
+     * @return 字段排序
+     */
+    int sequence() default -1;
+
+    /**
+     * 指定列宽
+     *
+     * @return 列宽
+     */
+    int width() default 120;
 }
