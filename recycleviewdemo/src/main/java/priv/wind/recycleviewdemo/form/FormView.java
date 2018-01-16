@@ -12,7 +12,8 @@ import priv.wind.recycleviewdemo.MainActivity;
 
 /**
  * 表单类
- *
+ * 整体功能由 FormView,FormAdapter,FormHelper,FormAttr四部分组成
+ * 实现了表单的添加、删除、清空、获取表单项等功能
  * @author Dongbaicheng
  * @version 2018/1/12
  */
@@ -27,6 +28,7 @@ public class FormView<E> {
     }
 
     //region 数据变更通知
+
     /**
      * 通知数据集变更
      */
@@ -54,6 +56,7 @@ public class FormView<E> {
     //endregion
 
     //region 对外暴露的接口
+
     /**
      * 添加新元素
      *
@@ -126,7 +129,7 @@ public class FormView<E> {
      * @return 当前数据集
      */
     public List<E> getDatas() {
-        return mFormAdapter.getDatas();
+        return mFormAdapter.getRawDatas();
     }
     //endregion
 

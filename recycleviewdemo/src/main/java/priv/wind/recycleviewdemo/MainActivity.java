@@ -23,7 +23,8 @@ public class MainActivity extends AppCompatActivity {
         btnOne.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mFormView.addList(getData());
+                //                mFormView.addList(getData());
+                mFormView.add(itemLabel);
             }
         });
 
@@ -69,11 +70,10 @@ public class MainActivity extends AppCompatActivity {
         return data;
     }
 
-    private void init(){
+    private void init() {
         mFormView = new FormView.FormBuilder<>(this, R.id.rv_detail, getData())
                 .setEnableDelete()
                 .setEnableSequence()
                 .build();
-
     }
 }

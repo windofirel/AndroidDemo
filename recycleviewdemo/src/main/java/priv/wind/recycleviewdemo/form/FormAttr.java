@@ -23,7 +23,7 @@ public @interface FormAttr {
     String name() default "未命名";
 
     /**
-     * 字段排序序号（从1开始）
+     * 字段排序序号（从1开始并且是连续的数字）
      *
      * @return 字段排序
      */

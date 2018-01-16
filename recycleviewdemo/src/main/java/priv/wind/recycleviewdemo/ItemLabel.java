@@ -16,7 +16,7 @@ public class ItemLabel {
     public double qty;
     @FormAttr(name = "单位", sequence = 5, width = 100)
     public String unit;
-    @FormAttr(name = "货位", sequence = 10)
+    @FormAttr(name = "货位", sequence = 6)
     public String location;
     @FormAttr(name = "标签号", sequence = 1, width = 250)
     public String no;
