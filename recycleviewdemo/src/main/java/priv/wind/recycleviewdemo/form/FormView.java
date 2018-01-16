@@ -1,4 +1,4 @@
-package priv.wind.recycleviewdemo;
+package priv.wind.recycleviewdemo.form;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -7,6 +7,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import java.util.List;
+
+import priv.wind.recycleviewdemo.MainActivity;
 
 /**
  * 表单类
@@ -24,10 +26,11 @@ public class FormView<E> {
         mFormAdapter = formAdapter;
     }
 
+    //region 数据变更通知
     /**
      * 通知数据集变更
      */
-    public void notifyDataSetChanged() {
+    private void notifyDataSetChanged() {
         mFormAdapter.notifyDataSetChanged();
     }
 
@@ -36,7 +39,7 @@ public class FormView<E> {
      *
      * @param index 元素索引
      */
-    public void notifyItemChanged(int index) {
+    private void notifyItemChanged(int index) {
         mFormAdapter.notifyItemChanged(index + 1);
     }
 
@@ -45,10 +48,12 @@ public class FormView<E> {
      *
      * @param element 元素
      */
-    public void notifyItemChanged(@NonNull E element) {
+    private void notifyItemChanged(@NonNull E element) {
         mFormAdapter.notifyItemChanged(element);
     }
+    //endregion
 
+    //region 对外暴露的接口
     /**
      * 添加新元素
      *
@@ -57,6 +62,16 @@ public class FormView<E> {
     @SuppressWarnings("unchecked")
     public void add(@NonNull E element) {
         mFormAdapter.add(element);
+    }
+
+    /**
+     * 添加新元素集
+     *
+     * @param elements 新元素集
+     */
+    @SuppressWarnings("unchecked")
+    public void addList(@NonNull List<E> elements) {
+        mFormAdapter.addList(elements);
     }
 
     /**
@@ -113,6 +128,7 @@ public class FormView<E> {
     public List<E> getDatas() {
         return mFormAdapter.getDatas();
     }
+    //endregion
 
     /**
      * 表单 构建 类

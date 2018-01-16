@@ -8,6 +8,8 @@ import android.widget.Button;
 import java.util.ArrayList;
 import java.util.List;
 
+import priv.wind.recycleviewdemo.form.FormView;
+
 public class MainActivity extends AppCompatActivity {
     FormView mFormView;
 
@@ -21,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
         btnOne.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mFormView.add(itemLabel);
+                mFormView.addList(getData());
             }
         });
 

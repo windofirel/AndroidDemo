@@ -1,4 +1,4 @@
-package priv.wind.recycleviewdemo;
+package priv.wind.recycleviewdemo.form;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -14,7 +14,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import priv.wind.recycleviewdemo.annotation.FormAttr;
+import priv.wind.recycleviewdemo.R;
 
 /**
  * @author Dongbaicheng
@@ -28,13 +28,16 @@ import priv.wind.recycleviewdemo.annotation.FormAttr;
 public class FormAdapter<E> extends RecyclerView.Adapter {
     private static final int ITEM_HEADER_TYPE = 894;
     private static final int ITEM_BODY_TYPE = 899;
+
     protected boolean mEnableSequence = false;//启用序号列
+
+    private Context mContext;//上下文环境
     private List<E> mDatas;//原始数据源
     private List<String> mHeaders;//表头
-    private Context mContext;//上下文环境
+    private List<Integer> mColumnWidth;//列宽
     private List<List<String>> mBodys;//解析后的表体数据源
-    private OnFormItemClickListener mOnFormItemClickListener;
-    private OnFormItemLongClickListener mOnFormItemLongClickListener;
+    private OnFormItemClickListener mOnFormItemClickListener;//点击事件
+    private OnFormItemLongClickListener mOnFormItemLongClickListener;//长按事件
 
     FormAdapter(@NonNull List<E> datas, @NonNull Context context) {
         this(datas, context, false);
@@ -43,7 +46,7 @@ public class FormAdapter<E> extends RecyclerView.Adapter {
     FormAdapter(@NonNull List<E> datas, @NonNull Context context, boolean enableSequence) {
         mEnableSequence = enableSequence;
         mDatas = datas;
-        mHeaders = getHeaderNames(datas.get(0));
+        resolveEntityAnnotation(datas.get(0));
         mBodys = getDatas(mDatas);
         mContext = context;
     }
@@ -56,10 +59,6 @@ public class FormAdapter<E> extends RecyclerView.Adapter {
         mOnFormItemClickListener = onFormItemClickListener;
     }
 
-    public void setDatas() {
-
-    }
-
     /**
      * 通过索引获取元素
      *
@@ -70,6 +69,11 @@ public class FormAdapter<E> extends RecyclerView.Adapter {
         return mDatas.get(index);
     }
 
+    /**
+     * 获取列表数据集
+     *
+     * @return 列表数据集
+     */
     public List<E> getDatas() {
         return mDatas;
     }
@@ -80,33 +84,26 @@ public class FormAdapter<E> extends RecyclerView.Adapter {
      * @param entity 简单实体
      */
     public void add(@NonNull E entity) {
-        List<String> dataRow = new ArrayList<>();
-        if (mEnableSequence) {
-            dataRow.add(String.valueOf(getItemCount()));
-        }
-        for (Field field : entity.getClass().getDeclaredFields()) {
-            FormAttr annotation = field.getAnnotation(FormAttr.class);
-            if (annotation != null) {
-                String value = "";
-                try {
-                    Object object = field.get(entity);
-                    if (object != null) {
-                        value = object.toString();
-                    } else {
-                        value = "";
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Log.e(this.getClass().toString(), "getDatas: ", e);
-                    value = "值反射失败";
-                }
-                dataRow.add(value);
-            }
-        }
+        List<String> dataRow = resolveEntity(entity, getItemCount());
         mDatas.add(entity);
         mBodys.add(dataRow);
         notifyDataSetChanged();
     }
+
+    /**
+     * 新增数据集
+     *
+     * @param entityList 简单实体
+     */
+    public void addList(@NonNull List<E> entityList) {
+        for (E entity : entityList) {
+            List<String> dataRow = resolveEntity(entity, getItemCount());
+            mDatas.add(entity);
+            mBodys.add(dataRow);
+        }
+        notifyDataSetChanged();
+    }
+
 
     /**
      * 删除
@@ -231,6 +228,41 @@ public class FormAdapter<E> extends RecyclerView.Adapter {
     }
 
     /**
+     * 解析实体获取列表信息
+     *
+     * @param entity   实体
+     * @param sequence 序号
+     * @return 列表信息
+     */
+    private List<String> resolveEntity(@NonNull E entity, int sequence) {
+        List<String> dataRow = new ArrayList<>();
+        if (mEnableSequence) {
+            dataRow.add(String.valueOf(sequence));
+        }
+        Field[] fields = entity.getClass().getDeclaredFields();
+        for (Field field : fields) {
+            FormAttr annotation = field.getAnnotation(FormAttr.class);
+            if (annotation != null) {
+                String value = "";
+                try {
+                    Object object = field.get(entity);
+                    if (object != null) {
+                        value = object.toString();
+                    } else {
+                        value = "";
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.e(this.getClass().toString(), "getDatas: ", e);
+                    value = "值反射失败";
+                }
+                dataRow.add(value);
+            }
+        }
+        return dataRow;
+    }
+
+    /**
      * 解析获取表体数据
      *
      * @param mDatas 数据源
@@ -241,29 +273,7 @@ public class FormAdapter<E> extends RecyclerView.Adapter {
         //用一个 map存储通过反射从数据源获取的数据，通过反射筛选出标记了特性的字段
         for (int i = 0; i < mDatas.size(); i++) {
             E entity = mDatas.get(i);
-            List<String> dataRow = new ArrayList<>();
-            if (mEnableSequence) {
-                dataRow.add(String.valueOf(i + 1));
-            }
-            for (Field field : entity.getClass().getDeclaredFields()) {
-                FormAttr annotation = field.getAnnotation(FormAttr.class);
-                if (annotation != null) {
-                    String value = "";
-                    try {
-                        Object object = field.get(entity);
-                        if (object != null) {
-                            value = object.toString();
-                        } else {
-                            value = "";
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Log.e(this.getClass().toString(), "getDatas: ", e);
-                        value = "值反射失败";
-                    }
-                    dataRow.add(value);
-                }
-            }
+            List<String> dataRow = resolveEntity(entity, i + 1);
             datas.add(dataRow);
         }
         return datas;
@@ -275,21 +285,23 @@ public class FormAdapter<E> extends RecyclerView.Adapter {
      * @param entity 列表行数据实体
      * @return 表头
      */
-    private List<String> getHeaderNames(E entity) {
-        List<String> headerNames = new ArrayList<>();
+    private void resolveEntityAnnotation(E entity) {
+        mHeaders = new ArrayList<>();
+        mColumnWidth = new ArrayList<>();
+
         if (mEnableSequence) {
-            headerNames.add("序号");
+            mHeaders.add("序号");
+            mColumnWidth.add(55);
         }
         Class entityClass = entity.getClass();
         Field[] fields = entityClass.getDeclaredFields();
         for (Field field : fields) {
             FormAttr annotation = field.getAnnotation(FormAttr.class);
             if (annotation != null) {
-                headerNames.add(annotation.name());
+                mHeaders.add(annotation.name());//获取字段对应的表头名称
+                mColumnWidth.add(annotation.width());//获取字段对应的列宽
             }
         }
-
-        return headerNames;
     }
 
     /**
@@ -334,12 +346,12 @@ public class FormAdapter<E> extends RecyclerView.Adapter {
             for (int i = 0; i < size; i++) {
                 if (i == 0
                         && mEnableSequence) {
-                    TextView textView = tool.createHeaderSequence();
+                    TextView textView = tool.createHeaderSequence(mColumnWidth.get(i));
                     mTextViews.add(textView);
                     linearLayout.addView(textView);
                     continue;
                 }
-                TextView textView = tool.createHeader();
+                TextView textView = tool.createHeader(mColumnWidth.get(i));
                 mTextViews.add(textView);
                 linearLayout.addView(textView);
             }
@@ -349,7 +361,7 @@ public class FormAdapter<E> extends RecyclerView.Adapter {
     /**
      * 表体viewholder
      */
-    public class BodyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener{
+    public class BodyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         List<TextView> mTextViews;
 
         BodyViewHolder(View itemView, int size) {
@@ -364,12 +376,12 @@ public class FormAdapter<E> extends RecyclerView.Adapter {
             for (int i = 0; i < size; i++) {
                 if (i == 0
                         && mEnableSequence) {
-                    TextView textView = tool.createBodySequence();
+                    TextView textView = tool.createBodySequence(mColumnWidth.get(i));
                     mTextViews.add(textView);
                     linearLayout.addView(textView);
                     continue;
                 }
-                TextView textView = tool.createBody();
+                TextView textView = tool.createBody(mColumnWidth.get(i));
                 mTextViews.add(textView);
                 linearLayout.addView(textView);
             }

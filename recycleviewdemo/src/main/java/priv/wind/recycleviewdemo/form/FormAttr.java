@@ -1,4 +1,4 @@
-package priv.wind.recycleviewdemo.annotation;
+package priv.wind.recycleviewdemo.form;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -34,5 +34,5 @@ public @interface FormAttr {
      *
      * @return 列宽
      */
-    int width() default 120;
+    int width() default 200;
 }

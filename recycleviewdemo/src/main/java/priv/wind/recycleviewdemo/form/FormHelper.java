@@ -1,8 +1,10 @@
-package priv.wind.recycleviewdemo;
+package priv.wind.recycleviewdemo.form;
 
 import android.content.Context;
 import android.view.Gravity;
 import android.widget.TextView;
+
+import priv.wind.recycleviewdemo.R;
 
 /**
  * UI创建工具类
@@ -23,27 +25,10 @@ public class FormHelper {
      *
      * @return 表头项控件
      */
-    public TextView createHeader() {
+    public TextView createHeader(int width) {
         TextView tvItem = new TextView(mContext);
         tvItem.setHeight(30);
-        tvItem.setWidth(200);
-        tvItem.setBackgroundResource(R.drawable.bg_tv_list_header);
-        tvItem.setGravity(Gravity.CENTER);
-        tvItem.setTextSize(16);
-        tvItem.setLines(1);
-        tvItem.setPadding(2, 0, 2, 0);
-        return tvItem;
-    }
-
-    /**
-     * 创建表头序号控件
-     *
-     * @return 表头项控件
-     */
-    public TextView createHeaderSequence() {
-        TextView tvItem = new TextView(mContext);
-        tvItem.setHeight(30);
-        tvItem.setWidth(55);
+        tvItem.setWidth(width);
         tvItem.setBackgroundResource(R.drawable.bg_tv_list_header);
         tvItem.setGravity(Gravity.CENTER);
         tvItem.setTextSize(16);
@@ -57,10 +42,10 @@ public class FormHelper {
      *
      * @return 表体项控件
      */
-    public TextView createBody() {
+    public TextView createBody(int width) {
         TextView tvItem = new TextView(mContext);
         tvItem.setHeight(30);
-        tvItem.setWidth(200);
+        tvItem.setWidth(width);
         tvItem.setBackgroundResource(R.drawable.bg_tv_list_body);
         tvItem.setGravity(Gravity.CENTER);
         tvItem.setTextSize(16);
@@ -70,14 +55,31 @@ public class FormHelper {
     }
 
     /**
+     * 创建表头序号控件
+     *
+     * @return 表头项控件
+     */
+    public TextView createHeaderSequence(int width) {
+        TextView tvItem = new TextView(mContext);
+        tvItem.setHeight(30);
+        tvItem.setWidth(width);
+        tvItem.setBackgroundResource(R.drawable.bg_tv_list_header);
+        tvItem.setGravity(Gravity.CENTER);
+        tvItem.setTextSize(16);
+        tvItem.setLines(1);
+        tvItem.setPadding(2, 0, 2, 0);
+        return tvItem;
+    }
+
+    /**
      * 创建表体控件
      *
      * @return 表体项控件
      */
-    public TextView createBodySequence() {
+    public TextView createBodySequence(int width) {
         TextView tvItem = new TextView(mContext);
         tvItem.setHeight(30);
-        tvItem.setWidth(55);
+        tvItem.setWidth(width);
         tvItem.setBackgroundResource(R.drawable.bg_tv_list_body);
         tvItem.setGravity(Gravity.CENTER);
         tvItem.setTextSize(16);
