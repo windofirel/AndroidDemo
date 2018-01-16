@@ -4,6 +4,6 @@
     <!--<stroke -->
     <!--列表的列之间的分割线，黑色分割线-->
     <size android:width="0.8dp"/>
-    <solid android:color="#000000"/>
-    <!--<solid android:color="#A9D4E9"/>-->
+    <!--<solid android:color="#000000"/>A9D4E9-->
+    <solid android:color="#00BCD4"/>
 </shape>

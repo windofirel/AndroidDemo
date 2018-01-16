@@ -102,8 +102,8 @@ public class FormView<E> {
      * @param datas 新数据集
      */
     @SuppressWarnings("unchecked")
-    public void updateData(List<E> datas) {
-        mFormAdapter.updataData(datas);
+    public void replaceDatas(List<E> datas) {
+        mFormAdapter.replaceData(datas);
     }
 
     /**

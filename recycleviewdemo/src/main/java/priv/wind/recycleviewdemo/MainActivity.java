@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         btnThree.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mFormView.updateData(getData());
+                mFormView.replaceDatas(getData());
             }
         });
 

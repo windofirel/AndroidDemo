@@ -166,11 +166,11 @@ public class FormAdapter<E> extends RecyclerView.Adapter {
     }
 
     /**
-     * 更新数据源
+     * 替换数据源
      *
      * @param datas 数据源
      */
-    public void updataData(List<E> datas) {
+    public void replaceData(List<E> datas) {
         mRawDatas = datas;
         mFormDatas.clear();
         mFormDatas.addAll(getFormDatas(mRawDatas));
@@ -385,7 +385,7 @@ public class FormAdapter<E> extends RecyclerView.Adapter {
             for (int i = 0; i < size; i++) {
                 if (i == 0
                         && mEnableSequence) {
-                    TextView textView = tool.createHeaderSequence(mColumnWidthes.get(i));
+                    TextView textView = tool.createHeader(mColumnWidthes.get(i));
                     mTextViews.add(textView);
                     linearLayout.addView(textView);
                     continue;
@@ -415,7 +415,7 @@ public class FormAdapter<E> extends RecyclerView.Adapter {
             for (int i = 0; i < size; i++) {
                 if (i == 0
                         && mEnableSequence) {
-                    TextView textView = tool.createBodySequence(mColumnWidthes.get(i));
+                    TextView textView = tool.createBody(mColumnWidthes.get(i));
                     mTextViews.add(textView);
                     linearLayout.addView(textView);
                     continue;
