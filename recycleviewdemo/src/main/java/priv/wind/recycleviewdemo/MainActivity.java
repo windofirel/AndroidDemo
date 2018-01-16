@@ -2,35 +2,52 @@ package priv.wind.recycleviewdemo;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.Button;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+    FormView mFormView;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        init();
-        initData();
-        initView();
-    }
+        init();
+        final ItemLabel itemLabel = new ItemLabel();
+        itemLabel.no = "sss";
+        Button btnOne = findViewById(R.id.btn_one);
+        btnOne.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mFormView.add(itemLabel);
+            }
+        });
 
-    private void initData() {
-        mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        mAdapter = new MyAdapter<>(getData(), this);
-    }
+        Button btnTwo = findViewById(R.id.btn_two);
+        btnTwo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mFormView.remove(itemLabel);
+            }
+        });
 
-    private void initView() {
-        mRecyclerView = ((RecyclerView) findViewById(R.id.rv_detail));
-        mRecyclerView.setLayoutManager(mLayoutManager);
-//        mRecyclerView.addItemDecoration(new MyDivider(this));
-        mRecyclerView.setAdapter(mAdapter) ;
+        Button btnThree = findViewById(R.id.btn_three);
+        btnThree.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mFormView.updateData(getData());
+            }
+        });
+
+        Button btnFour = findViewById(R.id.btn_four);
+        btnFour.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mFormView.clear();
+            }
+        });
     }
 
     private List<ItemLabel> getData() {
@@ -50,20 +67,11 @@ public class MainActivity extends AppCompatActivity {
         return data;
     }
 
-    private ArrayList<String> getTitles(){
-        ArrayList<String> titles = new ArrayList<>();
-        titles.add("序号");
-        titles.add("物料标签");
-        titles.add("数量");
-        titles.add("仓库编码");
-        titles.add("货位编码");
-        return titles;
-    }
-
     private void init(){
-        ItemLabel itemLabel = new ItemLabel();
-        ListHelper helper = new ListHelper();
-//        helper.getHeaderNames(itemLabel);
-//        helper.getHeaderNames(itemLabel.getClass());
+        mFormView = new FormView.FormBuilder<>(this, R.id.rv_detail, getData())
+                .setEnableDelete()
+                .setEnableSequence()
+                .build();
+
     }
 }

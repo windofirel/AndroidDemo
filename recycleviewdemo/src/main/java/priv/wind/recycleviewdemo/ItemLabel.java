@@ -1,6 +1,6 @@
 package priv.wind.recycleviewdemo;
 
-import priv.wind.recycleviewdemo.annotation.FormHeader;
+import priv.wind.recycleviewdemo.annotation.FormAttr;
 
 /**
  * @author Dongbaicheng
@@ -8,16 +8,18 @@ import priv.wind.recycleviewdemo.annotation.FormHeader;
  */
 
 public class ItemLabel {
-    @FormHeader(name = "物料编码")
+    @FormAttr(name = "物料编码", sequence = 2)
     public String itemCode;
-    @FormHeader(name = "物料名称")
+    @FormAttr(name = "物料名称", sequence = 3)
     public String itemName;
-    @FormHeader(name = "数量")
+    @FormAttr(name = "数量", sequence = 4)
     public double qty;
-    @FormHeader(name = "单位")
+    @FormAttr(name = "单位", sequence = 5)
     public String unit;
-    @FormHeader(name = "货位")
+    @FormAttr(name = "货位", sequence = 10)
     public String location;
-    @FormHeader(name = "标签号")
+    @FormAttr(name = "标签号", sequence = 1, width = 150)
     String no;
+
+    double requireQty;
 }

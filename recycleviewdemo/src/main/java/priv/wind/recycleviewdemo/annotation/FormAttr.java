@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 表单表头注解
+ * 表单属性注解
  *
  * @author Dongbaicheng
  * @version 2017/12/4
@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface FormHeader {
+public @interface FormAttr {
     /**
      * 表头名称
      *
@@ -23,7 +23,7 @@ public @interface FormHeader {
     String name() default "未命名";
 
     /**
-     * 字段排序（从1开始）
+     * 字段排序序号（从1开始）
      *
      * @return 字段排序
      */
