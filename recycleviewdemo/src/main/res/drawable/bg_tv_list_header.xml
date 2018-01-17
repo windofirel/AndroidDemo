@@ -5,10 +5,10 @@
         android:right="-0.8dp">
         <shape>
             <!--<solid android:color="#DEB887" />#EDEDED-->
-            <solid android:color="#B2EBF2"/>
+            <solid android:color="@color/primary_light"/>
             <stroke
                 android:width="0.8dip"
-                android:color="#00BCD4"/>
+                android:color="@color/primary"/>
         </shape>
     </item>
 </layer-list>

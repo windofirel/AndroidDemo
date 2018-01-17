@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -418,11 +419,22 @@ public class FormAdapter<E> extends RecyclerView.Adapter {
                     TextView textView = tool.createBody(mColumnWidthes.get(i));
                     mTextViews.add(textView);
                     linearLayout.addView(textView);
+
+                    LinearLayout.LayoutParams layoutParams = ((LinearLayout.LayoutParams) textView.getLayoutParams());
+                    layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT;
+                    layoutParams.width = mColumnWidthes.get(i);
+                    textView.setLayoutParams(layoutParams);
+
                     continue;
                 }
                 TextView textView = tool.createBody(mColumnWidthes.get(i));
                 mTextViews.add(textView);
                 linearLayout.addView(textView);
+
+                LinearLayout.LayoutParams layoutParams = ((LinearLayout.LayoutParams) textView.getLayoutParams());
+                layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT;
+                layoutParams.width = mColumnWidthes.get(i);
+                textView.setLayoutParams(layoutParams);
             }
         }
 
