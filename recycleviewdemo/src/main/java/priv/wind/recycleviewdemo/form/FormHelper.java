@@ -51,7 +51,7 @@ public class FormHelper {
         tvItem.setBackgroundResource(R.drawable.bg_tv_list_body);
         tvItem.setGravity(Gravity.CENTER);
         tvItem.setTextSize(16);
-        //        tvItem.setTextColor(Color.parseColor("#757575"));
+        //                tvItem.setTextColor(Color.parseColor("#757575"));
         tvItem.setMaxLines(2);
         tvItem.setPadding(2, 0, 2, 0);
         return tvItem;

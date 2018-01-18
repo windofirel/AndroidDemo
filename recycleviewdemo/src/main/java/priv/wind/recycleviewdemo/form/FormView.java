@@ -6,6 +6,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import priv.wind.recycleviewdemo.MainActivity;
@@ -189,6 +190,13 @@ public class FormView<E> {
                 mFormParams.mLayoutManager = new LinearLayoutManager(mFormParams.mContext, LinearLayoutManager.VERTICAL, false);
             }
             recyclerView.setLayoutManager(mFormParams.mLayoutManager);
+
+            //添加装饰器
+            if (mFormParams.mItemDecorations.size() > 0) {
+                for (RecyclerView.ItemDecoration itemDecoration : mFormParams.mItemDecorations) {
+                    recyclerView.addItemDecoration(itemDecoration);
+                }
+            }
             //设置适配器
             recyclerView.setAdapter(mFormAdapter);
 
@@ -247,6 +255,17 @@ public class FormView<E> {
             mFormParams.mLayoutManager = manager;
             return this;
         }
+
+        /**
+         * 添加装饰器
+         *
+         * @param itemDecoration 装饰器
+         * @return 表单构建者
+         */
+        public FormBuilder addItemDecoration(@NonNull RecyclerView.ItemDecoration itemDecoration) {
+            mFormParams.mItemDecorations.add(itemDecoration);
+            return this;
+        }
     }
 
     /**
@@ -256,6 +275,7 @@ public class FormView<E> {
         private Context mContext;//上下文
         private int mResId;//form控件Id
         private RecyclerView.LayoutManager mLayoutManager;
+        private List<RecyclerView.ItemDecoration> mItemDecorations;
 
         private FormAdapter.OnFormItemClickListener mOnFormItemClickListener;//点击监听事件
         private FormAdapter.OnFormItemLongClickListener mOnFormItemLongClickListener;//长按监听事件
@@ -269,6 +289,7 @@ public class FormView<E> {
             mResId = resId;
             mEnableDelete = false;
             mEnableSequence = false;
+            mItemDecorations = new ArrayList<>();
         }
     }
 }

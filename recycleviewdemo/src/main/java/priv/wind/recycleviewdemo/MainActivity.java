@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
         mFormView = new FormView.FormBuilder<>(this, R.id.rv_detail, getData())
                 .setEnableDelete()
                 .setEnableSequence()
+                .addItemDecoration(new MyDivider(this))
                 .build();
     }
 }

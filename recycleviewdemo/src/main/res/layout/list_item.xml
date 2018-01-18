@@ -4,10 +4,8 @@
               android:layout_height="wrap_content"
               android:background="@drawable/bg_item_view"
               android:clickable="true"
-              android:divider="@drawable/divider_list"
               android:focusable="true"
               android:focusableInTouchMode="true"
               android:orientation="horizontal"
-              android:showDividers="middle">
-
+    >
 </LinearLayout>
