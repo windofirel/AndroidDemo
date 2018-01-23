@@ -2,12 +2,17 @@ package priv.wind.recycleviewdemo;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import priv.wind.recycleviewdemo.extend.ExtendAdapter;
+import priv.wind.recycleviewdemo.extend.ExtendItemDecoration;
+import priv.wind.recycleviewdemo.extend.RecyclerExtend;
 import priv.wind.recycleviewdemo.form.FormView;
 
 public class MainActivity extends AppCompatActivity {
@@ -15,8 +20,31 @@ public class MainActivity extends AppCompatActivity {
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        init();
+        setContentView(R.layout.activity_extend);
+
+        initDemo();
+        //        init();
+        //        initButton();
+    }
+
+    private void initDemo() {
+        RecyclerExtend extend = findViewById(R.id.re_demo);
+        RecyclerView.LayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        ExtendAdapter adapter = new ExtendAdapter(this, new ArrayList<String>());
+        extend.setLayoutManager(manager);
+        extend.addItemDecoration(new ExtendItemDecoration(this));
+        extend.setAdapter(adapter);
+    }
+
+    private List<String> getStringData() {
+        List<String> datas = new ArrayList<>();
+        for (int i = 0; i < 30; i++) {
+            datas.add("3838382929天" + String.valueOf(i));
+        }
+        return datas;
+    }
+
+    private void initButton() {
         final ItemLabel itemLabel = new ItemLabel();
         itemLabel.no = "sss";
         Button btnOne = findViewById(R.id.btn_one);
@@ -71,10 +99,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void init() {
-        mFormView = new FormView.FormBuilder<>(this, R.id.rv_detail, getData())
+        mFormView = new FormView.FormBuilder<>(this, R.id.rv_detail, new ArrayList<ItemLabel>(), ItemLabel.class)
+                //        mFormView = new FormView.FormBuilder<>(this, R.id.rv_detail, getData(), ItemLabel.class)
                 .setEnableDelete()
                 .setEnableSequence()
-                .addItemDecoration(new MyDivider(this))
                 .build();
+
     }
 }

@@ -13,11 +13,14 @@
         android:layout_margin="3dp"
         android:layout_weight="1"
         android:background="@drawable/bg_grid_line">
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_detail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:paddingTop="30px"
             />
+
     </HorizontalScrollView>
 
     <Button

@@ -6,6 +6,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import priv.wind.recycleviewdemo.MainActivity;
  * 表单类
  * 整体功能由 FormView,FormAdapter,FormHelper,FormAttr四部分组成
  * 实现了表单的添加、删除、清空、获取表单项等功能
+ *
  * @author Dongbaicheng
  * @version 2018/1/12
  */
@@ -145,6 +147,8 @@ public class FormView<E> {
         private FormParams mFormParams;
         private List<E> mDatas;
         private FormAdapter<E> mFormAdapter;
+        private List<FormAttrBean> mFormAttrBeans;
+        private Class mItemClass;
 
         /**
          * 构建表单类构造方法
@@ -152,9 +156,10 @@ public class FormView<E> {
          * @param context 上下文
          * @param resId   form控件Id
          */
-        public FormBuilder(@NonNull Context context, int resId, @NonNull List<E> datas) {
+        public FormBuilder(@NonNull Context context, int resId, @NonNull List<E> datas, Class itemClass) {
             mFormParams = new FormParams(context, resId);
             mDatas = datas;
+            mItemClass = itemClass;
         }
 
         /**
@@ -164,7 +169,10 @@ public class FormView<E> {
          */
         public FormView<E> build() {
             RecyclerView recyclerView = ((MainActivity) mFormParams.mContext).findViewById(mFormParams.mResId);
-            mFormAdapter = new FormAdapter<>(mDatas, mFormParams.mContext, mFormParams.mEnableSequence);
+            mFormAttrBeans = resolveEntityAnnotation(mItemClass);
+            addItemDecoration(new FormDecoration(mFormParams.mContext, mFormAttrBeans));
+
+            mFormAdapter = new FormAdapter<>(mFormParams.mContext, mDatas, mFormAttrBeans, mFormParams.mEnableSequence);
 
             //设置点击监听事件
             if (mFormParams.mOnFormItemClickListener != null) {
@@ -265,6 +273,59 @@ public class FormView<E> {
         public FormBuilder addItemDecoration(@NonNull RecyclerView.ItemDecoration itemDecoration) {
             mFormParams.mItemDecorations.add(itemDecoration);
             return this;
+        }
+
+        /**
+         * 通过反射解析获取表头注解对象
+         *
+         * @param entityClass 列表行数据对象
+         */
+        private List<FormAttrBean> resolveEntityAnnotation(Class entityClass) {
+            List<FormAttrBean> formAttrBeans = new ArrayList<>();
+
+            if (mFormParams.mEnableSequence) {
+                FormAttrBean firstBean = new FormAttrBean();
+                firstBean.headerName = "序号";
+                firstBean.columnWidth = 55;
+                firstBean.columnSeq = 0;
+                formAttrBeans.add(firstBean);
+            }
+
+            Field[] fields = entityClass.getDeclaredFields();
+            for (Field field : fields) {
+                FormAttr annotation = field.getAnnotation(FormAttr.class);
+                if (annotation != null) {
+                    FormAttrBean otherBean = new FormAttrBean();
+                    otherBean.headerName = annotation.name();//获取字段对应的表头名称
+                    otherBean.columnWidth = annotation.width();//获取字段对应的列宽
+                    otherBean.columnSeq = annotation.sequence();//获取字段对应的序列
+                    formAttrBeans.add(otherBean);
+                }
+            }
+
+            //对表头及宽度进行排序便于使用
+            int count = formAttrBeans.size();
+            String[] sortHeaders = new String[count];
+            Integer[] sortColumnWidth = new Integer[count];
+            for (int i = 0; i < count; i++) {
+                FormAttrBean bean = formAttrBeans.get(i);
+                int sortIndex = bean.columnSeq;
+                if (mFormParams.mEnableSequence) {
+                    sortHeaders[sortIndex] = bean.headerName;
+                    sortColumnWidth[sortIndex] = bean.columnWidth;
+                } else {
+                    //没有启用序号列时，索引需要减1才是从0开始，避免数组越界异常
+                    sortHeaders[sortIndex - 1] = bean.headerName;
+                    sortColumnWidth[sortIndex - 1] = bean.columnWidth;
+                }
+            }
+
+            for (int i = 0; i < count; i++) {
+                FormAttrBean bean = formAttrBeans.get(i);
+                bean.headerName = sortHeaders[i];
+                bean.columnWidth = sortColumnWidth[i];
+            }
+            return formAttrBeans;
         }
     }
 

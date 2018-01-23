@@ -28,7 +28,6 @@ import priv.wind.recycleviewdemo.R;
 // TODO: 2017/12/9 对泛型实体字段进行排序
 // TODO: 2017/12/28 不要一开始就对数据源进行反射，应该在每次getItem时反射获取数据
 public class FormAdapter<E> extends RecyclerView.Adapter {
-    private static final int ITEM_HEADER_TYPE = 894;
     private static final int ITEM_BODY_TYPE = 899;
 
     protected boolean mEnableSequence = false;//启用序号列
@@ -36,24 +35,23 @@ public class FormAdapter<E> extends RecyclerView.Adapter {
     private Context mContext;//上下文环境
     private List<E> mRawDatas;//原始数据源
     private List<List<String>> mFormDatas;//解析后的表单数据源
-    private List<String> mHeaders;//表头
-    private List<Integer> mColumnWidthes;//列宽
-    private List<Integer> mSortingList;//序列
+    private List<FormAttrBean> mFormAttrBeans;
     private OnFormItemClickListener mOnFormItemClickListener;//点击事件
     private OnFormItemLongClickListener mOnFormItemLongClickListener;//长按事件
 
-    FormAdapter(@NonNull List<E> rawDatas, @NonNull Context context) {
-        this(rawDatas, context, false);
+    FormAdapter(@NonNull Context context, @NonNull List<E> rawDatas, List<FormAttrBean> formAttrBeans) {
+        this(context, rawDatas, formAttrBeans, false);
     }
 
-    FormAdapter(@NonNull List<E> rawDatas, @NonNull Context context, boolean enableSequence) {
+    FormAdapter(@NonNull Context context, @NonNull List<E> rawDatas, List<FormAttrBean> formAttrBeans, boolean enableSequence) {
         mEnableSequence = enableSequence;
         mRawDatas = rawDatas;
-        resolveEntityAnnotation(rawDatas.get(0));
+        mFormAttrBeans = formAttrBeans;
         mFormDatas = getFormDatas(mRawDatas);
         mContext = context;
     }
 
+    //region 数据操作
     public void setOnFormItemLongClickListener(OnFormItemLongClickListener onFormItemLongClickListener) {
         mOnFormItemLongClickListener = onFormItemLongClickListener;
     }
@@ -107,7 +105,6 @@ public class FormAdapter<E> extends RecyclerView.Adapter {
         notifyDataSetChanged();
     }
 
-
     /**
      * 删除
      *
@@ -122,7 +119,7 @@ public class FormAdapter<E> extends RecyclerView.Adapter {
         } else {
             mRawDatas.remove(index);
             mFormDatas.remove(index);
-            notifyItemRemoved(index + 1);
+            notifyItemRemoved(index);
         }
     }
 
@@ -142,7 +139,7 @@ public class FormAdapter<E> extends RecyclerView.Adapter {
         } else {
             mRawDatas.remove(index);
             mFormDatas.remove(index);
-            notifyItemRemoved(index + 1);
+            notifyItemRemoved(index);
         }
     }
 
@@ -186,12 +183,10 @@ public class FormAdapter<E> extends RecyclerView.Adapter {
         mFormDatas.clear();
         notifyDataSetChanged();
     }
+    //endregion
 
     @Override
     public int getItemViewType(int position) {
-        if (position == 0) {
-            return ITEM_HEADER_TYPE;
-        }
         return ITEM_BODY_TYPE;
     }
 
@@ -201,33 +196,22 @@ public class FormAdapter<E> extends RecyclerView.Adapter {
                 .from(parent.getContext())
                 .inflate(R.layout.list_item, parent, false);
 
-        if (viewType == ITEM_HEADER_TYPE) {
-            return new HeaderViewHolder(view, mHeaders.size());
-        }
-        return new BodyViewHolder(view, mHeaders.size());
+        return new BodyViewHolder(view, mFormAttrBeans.size());
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        if (getItemViewType(position) == ITEM_HEADER_TYPE) {
-            HeaderViewHolder viewHolder = ((HeaderViewHolder) holder);
-            for (int i = 0; i < mHeaders.size(); i++) {
-                viewHolder.mTextViews.get(i).setText(mHeaders.get(i));
-            }
-        } else {
-            final BodyViewHolder viewHolder = ((BodyViewHolder) holder);
-            for (int i = 0; i < mHeaders.size(); i++) {
-                //因为 position 0 是表头，所以数据行数 对应为 实际位置 - 1
-                List<String> list = mFormDatas.get(position - 1);
-                viewHolder.mTextViews.get(i).setText(list.get(i));
-            }
+        final BodyViewHolder viewHolder = ((BodyViewHolder) holder);
+        for (int i = 0; i < mFormAttrBeans.size(); i++) {
+            //因为 position 0 是表头，所以数据行数 对应为 实际位置 - 1
+            List<String> list = mFormDatas.get(position);
+            viewHolder.mTextViews.get(i).setText(list.get(i));
         }
     }
 
     @Override
     public int getItemCount() {
-        //因为表头占了一行，所以总数为 数据数量 + 1
-        return mRawDatas == null ? 0 : mRawDatas.size() + 1;
+        return mRawDatas == null ? 0 : mRawDatas.size();
     }
 
     /**
@@ -238,7 +222,7 @@ public class FormAdapter<E> extends RecyclerView.Adapter {
      * @return 列表信息
      */
     private List<String> resolveEntity(@NonNull E entity, int sequence) {
-        String[] dataRow = new String[mHeaders.size()];
+        String[] dataRow = new String[mFormAttrBeans.size()];
 
         Field[] fields = entity.getClass().getDeclaredFields();
         List<Field> usefulFields = new ArrayList<>();
@@ -271,9 +255,9 @@ public class FormAdapter<E> extends RecyclerView.Adapter {
             }
 
             if (mEnableSequence) {
-                dataRow[mSortingList.get(i + 1)] = value;
+                dataRow[mFormAttrBeans.get(i + 1).columnSeq] = value;
             } else {
-                dataRow[mSortingList.get(i) - 1] = value;
+                dataRow[mFormAttrBeans.get(i).columnSeq - 1] = value;
             }
         }
         return Arrays.asList(dataRow);
@@ -294,54 +278,6 @@ public class FormAdapter<E> extends RecyclerView.Adapter {
             datas.add(dataRow);
         }
         return datas;
-    }
-
-    /**
-     * 反射获取表头
-     *
-     * @param entity 列表行数据实体
-     */
-    private void resolveEntityAnnotation(E entity) {
-        mHeaders = new ArrayList<>();
-        mColumnWidthes = new ArrayList<>();
-        mSortingList = new ArrayList<>();
-
-        if (mEnableSequence) {
-            mHeaders.add("序号");
-            mColumnWidthes.add(55);
-            mSortingList.add(0);
-        }
-        Class entityClass = entity.getClass();
-        Field[] fields = entityClass.getDeclaredFields();
-        for (Field field : fields) {
-            FormAttr annotation = field.getAnnotation(FormAttr.class);
-            if (annotation != null) {
-                mHeaders.add(annotation.name());//获取字段对应的表头名称
-                mColumnWidthes.add(annotation.width());//获取字段对应的列宽
-                mSortingList.add(annotation.sequence());//获取字段对应的序列
-            }
-        }
-        sort();
-    }
-
-    /**
-     * 对表头及宽度进行排序
-     */
-    private void sort() {
-        String[] sortHeaders = new String[mSortingList.size()];
-        Integer[] sortColumnWidth = new Integer[mSortingList.size()];
-        for (int i = 0; i < mSortingList.size(); i++) {
-            if (mEnableSequence) {
-                sortHeaders[mSortingList.get(i)] = mHeaders.get(i);
-                sortColumnWidth[mSortingList.get(i)] = mColumnWidthes.get(i);
-            } else {
-                //没有启用序号列时，索引需要减1才是从0开始，避免数组越界异常
-                sortHeaders[mSortingList.get(i) - 1] = mHeaders.get(i);
-                sortColumnWidth[mSortingList.get(i) - 1] = mColumnWidthes.get(i);
-            }
-        }
-        mHeaders = Arrays.asList(sortHeaders);
-        mColumnWidthes = Arrays.asList(sortColumnWidth);
     }
 
     /**
@@ -372,39 +308,12 @@ public class FormAdapter<E> extends RecyclerView.Adapter {
     }
 
     /**
-     * 表头viewholder
-     */
-    public class HeaderViewHolder extends RecyclerView.ViewHolder {
-        List<TextView> mTextViews;
-
-        HeaderViewHolder(View itemView, int size) {
-            super(itemView);
-            mTextViews = new ArrayList<>();
-            FormHelper tool = new FormHelper(mContext);
-            LinearLayout linearLayout = ((LinearLayout) itemView);
-
-            for (int i = 0; i < size; i++) {
-                if (i == 0
-                        && mEnableSequence) {
-                    TextView textView = tool.createHeader(mColumnWidthes.get(i));
-                    mTextViews.add(textView);
-                    linearLayout.addView(textView);
-                    continue;
-                }
-                TextView textView = tool.createHeader(mColumnWidthes.get(i));
-                mTextViews.add(textView);
-                linearLayout.addView(textView);
-            }
-        }
-    }
-
-    /**
      * 表体viewholder
      */
     public class BodyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         List<TextView> mTextViews;
 
-        BodyViewHolder(View itemView, int size) {
+        BodyViewHolder(View itemView, int columnCount) {
             super(itemView);
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
@@ -413,27 +322,28 @@ public class FormAdapter<E> extends RecyclerView.Adapter {
             FormHelper tool = new FormHelper(mContext);
             LinearLayout linearLayout = ((LinearLayout) itemView);
 
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < columnCount; i++) {
+                int width = mFormAttrBeans.get(i).columnWidth;
                 if (i == 0
                         && mEnableSequence) {
-                    TextView textView = tool.createBody(mColumnWidthes.get(i));
+                    TextView textView = tool.createBody(width);
                     mTextViews.add(textView);
                     linearLayout.addView(textView);
 
                     LinearLayout.LayoutParams layoutParams = ((LinearLayout.LayoutParams) textView.getLayoutParams());
                     layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT;
-                    layoutParams.width = mColumnWidthes.get(i);
+                    layoutParams.width = width;
                     textView.setLayoutParams(layoutParams);
 
                     continue;
                 }
-                TextView textView = tool.createBody(mColumnWidthes.get(i));
+                TextView textView = tool.createBody(width);
                 mTextViews.add(textView);
                 linearLayout.addView(textView);
 
                 LinearLayout.LayoutParams layoutParams = ((LinearLayout.LayoutParams) textView.getLayoutParams());
                 layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT;
-                layoutParams.width = mColumnWidthes.get(i);
+                layoutParams.width = width;
                 textView.setLayoutParams(layoutParams);
             }
         }
@@ -441,14 +351,14 @@ public class FormAdapter<E> extends RecyclerView.Adapter {
         @Override
         public void onClick(View v) {
             if (mOnFormItemClickListener != null) {
-                mOnFormItemClickListener.onClick(v, getLayoutPosition() - 1);
+                mOnFormItemClickListener.onClick(v, getLayoutPosition());
             }
         }
 
         @Override
         public boolean onLongClick(View v) {
             if (mOnFormItemLongClickListener != null) {
-                return mOnFormItemLongClickListener.onLongClick(v, getLayoutPosition() - 1);
+                return mOnFormItemLongClickListener.onLongClick(v, getLayoutPosition());
             }
 
             return false;
